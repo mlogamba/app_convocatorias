@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Conv. Sporting Picanya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="https://drive.google.com/thumbnail?id=1e4q_Gu_lq1GaxHk5bsF4VfCqteqUDKsV&sz=w512">
+<link rel="apple-touch-icon" href="https://drive.google.com/thumbnail?id=1e4q_Gu_lq1GaxHk5bsF4VfCqteqUDKsV&sz=w512">
+<meta name="apple-mobile-web-app-title" content="Conv. Sporting Picanya">
+<meta name="application-name" content="Conv. Sporting Picanya">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#082A1B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--v900:#082A1B;--v700:#0F5C38;--v500:#16915A;--v300:#5CD08A;--crema:#FAF9F5;--tinta:#0E1B14;--gris:#697570;--linea:#E4E8E2;--si:#0F6B3F;--si-bg:#E2F5EC;--no:#C0392B;--no-bg:#FDECEA;--pe:#9A7A00;--pe-bg:#FBF3D2}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--crema)}
+body{margin:0;color:var(--tinta);font:400 16px/1.5 Outfit,system-ui,sans-serif;padding-bottom:70px;-webkit-font-smoothing:antialiased}
+.hero{position:relative;width:100%;max-width:560px;margin:0 auto;aspect-ratio:16/9;overflow:hidden;background:linear-gradient(135deg,var(--v700),var(--v900))}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%;display:block}
+.marca-club{display:flex;align-items:center;gap:14px;margin:20px 0 18px}
+.logo-club{width:66px;height:66px;object-fit:contain;background:#fff;border-radius:50%;padding:6px;box-shadow:0 4px 14px rgba(8,42,27,.18);flex-shrink:0;border:1px solid var(--linea)}
+.marca-club h1{font:800 21px/1.18 Outfit;margin:0;color:var(--tinta)}
+.fecha-partido{font:700 16px/1.3 Outfit;color:var(--v700);margin:0 0 12px}
+.badge{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 Outfit;padding:4px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.b-jornada{background:var(--v900);color:#fff}
+.b-casa{background:var(--si-bg);color:var(--si);border:1px solid rgba(15,107,63,.2)}
+.b-fuera{background:#E8F0FE;color:#1967D2;border:1px solid rgba(25,103,210,.2)}
+.b-aplazado{background:#FDE8E8;color:#C5221F;border:1px solid #F5C2C7;animation:pulso 2s infinite}
+@keyframes pulso{0%,100%{opacity:1}50%{opacity:.7}}
+.cabecera-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}
+.titulo-partido{font:800 20px/1.2 Outfit;color:var(--tinta);margin:2px 0 6px}
+.banner-aplazado{background:#FFF3CD;border:1.5px solid #FFE082;border-radius:18px;padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start;animation:subir .4s both}
+.banner-aplazado strong{display:block;font:800 16px Outfit;color:#9A7A00;margin-bottom:3px}
+.banner-aplazado p{margin:0;font:400 13.5px/1.4 Outfit;color:#664D03}
+.env{max-width:560px;margin:0 auto;padding:0 16px}
+.tarjeta-partido{background:#fff;border-radius:22px;padding:18px 18px 16px;margin:0;position:relative;z-index:3;box-shadow:0 8px 24px rgba(8,42,27,.10);animation:subir .4s cubic-bezier(.2,.8,.2,1) both}
+.datos{display:grid;grid-template-columns:auto 1fr;gap:9px 14px}
+.datos dt{color:var(--gris);font:600 12px/1 Outfit;text-transform:uppercase;letter-spacing:.04em;align-self:center}
+.datos dd{margin:0;font:600 15px/1.3 Outfit;color:var(--tinta)}
+.datos a{color:var(--v700);text-decoration:none;border-bottom:1.5px solid var(--v300)}
+.cam{display:inline-flex;align-items:center;gap:7px}
+.cam i{width:12px;height:12px;border-radius:3px;background:#3FBF7F;display:inline-block;box-shadow:0 0 0 2px #fff,0 0 0 3px var(--linea)}
+.aviso{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--linea);font:400 13.5px/1.45 Outfit;color:var(--gris)}
+.marcador{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 6px;animation:subir .5s .05s both}
+.m-card{background:#fff;border-radius:16px;padding:13px 6px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.05);cursor:pointer;border:2px solid transparent;transition:transform .15s,box-shadow .15s,border-color .15s}
+.m-card:active{transform:scale(.97)}
+.m-card b{display:block;font:800 27px/1 Outfit}
+.m-card span{font:600 11px Outfit;color:var(--gris);text-transform:uppercase;letter-spacing:.03em}
+.m-si b{color:var(--si)}.m-no b{color:var(--no)}.m-pe b{color:var(--pe)}
+.m-card.activo-si{border-color:var(--si);background:var(--si-bg)}
+.m-card.activo-no{border-color:var(--no);background:var(--no-bg)}
+.m-card.activo-pe{border-color:var(--pe);background:var(--pe-bg)}
+.barra{height:7px;border-radius:99px;overflow:hidden;display:flex;margin:12px 0 16px;background:var(--linea)}
+.barra i{display:block;height:100%;transition:width .5s}
+.b-si{background:var(--si)}.b-no{background:var(--no)}.b-pe{background:var(--pe-bg)}
+.filtros-estado{display:flex;gap:7px;margin:0 0 16px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+.filtro-btn{background:#fff;border:1.5px solid var(--linea);border-radius:99px;padding:8px 14px;font:600 13px/1 Outfit;color:var(--gris);cursor:pointer;white-space:nowrap;transition:all .15s}
+.filtro-btn.sel{background:var(--v900);color:#fff;border-color:var(--v900)}
+.filtro-btn.sel-SI{background:var(--si);color:#fff;border-color:var(--si)}
+.filtro-btn.sel-NO{background:var(--no);color:#fff;border-color:var(--no)}
+.filtro-btn.sel-PENDIENTE{background:var(--pe);color:#fff;border-color:var(--pe)}
+h2{font:700 12.5px/1 Outfit;letter-spacing:.08em;color:var(--gris);text-transform:uppercase;margin:0 0 10px}
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gris);pointer-events:none}
+input[type=search]{width:100%;padding:13px 14px 13px 43px;border:1.5px solid var(--linea);border-radius:14px;font:500 16px Outfit;background:#fff;color:var(--tinta)}
+input[type=search]:focus{outline:none;border-color:var(--v500);box-shadow:0 0 0 4px rgba(22,145,90,.12)}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+li{opacity:0;animation:subir .35s ease-out .05s forwards}
+.jug{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid var(--linea);border-radius:16px;padding:11px 14px;text-align:left;font:500 15px Outfit;color:var(--tinta);cursor:pointer;min-height:60px;box-shadow:0 3px 10px rgba(8,42,27,.05);transition:transform .12s}
+.jug:active{transform:scale(.98)}
+.dorsal{flex:0 0 40px;height:40px;border-radius:50%;background:linear-gradient(155deg,var(--v500),var(--v700));color:#fff;display:grid;place-items:center;font:700 16px Outfit;box-shadow:0 3px 8px rgba(15,92,56,.3)}
+.nom{flex:1;line-height:1.25}
+.nota-jug{display:block;font:400 12px Outfit;color:var(--gris);margin-top:1px}
+.sello{font:700 10.5px Outfit;letter-spacing:.05em;padding:5px 10px;border-radius:99px;white-space:nowrap;text-transform:uppercase}
+.s-SI{background:var(--si-bg);color:var(--si)}.s-NO{background:var(--no-bg);color:var(--no)}.s-PENDIENTE{background:var(--pe-bg);color:var(--pe)}
+.jug.desc{background:var(--no-bg);border-color:var(--no)}
+.jug.desc .dorsal{background:linear-gradient(155deg,#E5584A,var(--no))}
+.jug.desc .nom{color:var(--no)}
+.nota-desc{display:block;font:800 12px Outfit;color:var(--no);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.fondo{position:fixed;inset:0;background:rgba(6,20,13,.62);display:none;z-index:9;backdrop-filter:blur(2px)}
+.fondo.on{display:block}
+.panel{position:fixed;left:0;right:0;bottom:0;z-index:10;background:#fff;border-radius:26px 26px 0 0;padding:8px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(102%);transition:transform .26s cubic-bezier(.32,.72,0,1);max-width:560px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+.panel.on{transform:none}
+.panel-handle{width:38px;height:4px;background:var(--linea);border-radius:2px;margin:0 auto 18px}
+.panel h3{font:700 21px Outfit;margin:0 0 3px}
+.panel .sub{margin:0 0 16px;color:var(--gris);font-size:14px}
+.opciones{display:grid;gap:10px;margin-bottom:14px}
+.op{border:2px solid var(--linea);background:#fff;border-radius:16px;padding:16px;font:700 16px Outfit;color:var(--tinta);cursor:pointer;text-align:center}
+.op.sel-si{border-color:var(--si);background:var(--si-bg);color:var(--si)}
+.op.sel-no{border-color:var(--no);background:var(--no-bg);color:var(--no)}
+label.et-nota{display:block;margin:2px 0 6px;font:500 13px Outfit;color:var(--gris)}
+input[type=text]{width:100%;padding:12px 14px;border:1.5px solid var(--linea);border-radius:12px;font:400 15px Outfit;background:var(--crema);color:var(--tinta);margin-bottom:12px}
+input[type=text]:focus{outline:none;border-color:var(--v500)}
+.btn-pri{width:100%;padding:17px;border:0;border-radius:16px;background:linear-gradient(135deg,var(--v500),var(--v700));color:#fff;font:700 16px Outfit;cursor:pointer;box-shadow:0 6px 18px rgba(15,92,56,.35)}
+.btn-pri:disabled{background:#BFC9C4;box-shadow:none;cursor:not-allowed}
+.btn-wapp{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:14px;border-radius:16px;border:1.5px solid #25D366;color:#128C7E;text-decoration:none;font:700 15px Outfit;background:#F0FBF4}
+.btn-cancel{background:none;border:0;color:var(--gris);font:500 15px Outfit;padding:12px 0 0;width:100%;cursor:pointer}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));background:var(--tinta);color:#fff;padding:14px 16px;border-radius:14px;font:500 15px Outfit;z-index:20;max-width:528px;margin:0 auto;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.on{opacity:1;transform:none}
+.cerrada-aviso{background:var(--pe-bg);color:var(--pe);border-radius:14px;padding:13px 15px;margin-bottom:16px;font:500 14px Outfit}
+.vacio{text-align:center;color:var(--gris);padding:60px 16px;font-size:15px}
+@keyframes subir{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.contador-visitas{position:absolute;top:12px;right:12px;z-index:5;display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:99px;background:rgba(8,42,27,.55);backdrop-filter:blur(4px);color:#fff;font:600 12px/1 Outfit}
+.contador-visitas svg{width:13px;height:13px;flex-shrink:0;opacity:.9}
+.pie-app{max-width:560px;margin:28px auto 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));text-align:center;border-top:1px solid var(--linea)}
+.pie-app p{margin:0;font:500 11.5px/1.5 Outfit;color:var(--gris)}
+.pie-app strong{color:var(--tinta);font-weight:700}
+</style>
+</head>
+<body>
+<div class="hero">
+  <img src="https://drive.google.com/thumbnail?id=10STBS_hRABI8lOFf6-L3vN2ysmL1NVpk&sz=w1600" alt="">
+  <div class="contador-visitas" id="contadorVisitas" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span id="numVisitas">…</span>
+  </div>
+</div>
+<div class="env">
+  <div class="marca-club">
+    <img class="logo-club" src="https://drive.google.com/thumbnail?id=1e4q_Gu_lq1GaxHk5bsF4VfCqteqUDKsV&sz=w300" alt="Escudo C.F. Sporting de Picanya">
+    <h1>Convocatorias C.F. Sporting de Picanya</h1>
+  </div>
+</div>
+<div id="app"><div class="env"><p class="vacio">Cargando la convocatoria…</p></div></div>
+<footer class="pie-app">
+  <p>Created by and property of <strong>Marcello Gambardella</strong> · © <span id="anioPie"></span> · All rights reserved.</p>
+</footer>
+<div class="fondo" id="fondo" onclick="cerrar()"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true">
+  <div class="panel-handle"></div>
+  <h3 id="pNombre"></h3>
+  <p class="sub">Responde solo por ti. Puedes cambiar tu respuesta antes del cierre.</p>
+  <div class="opciones">
+    <button class="op" id="opSi" onclick="elegir('SI')">✅&nbsp; SÍ, VOY</button>
+    <button class="op" id="opNo" onclick="elegir('NO')">❌&nbsp; NO PUEDO IR</button>
+  </div>
+  <label class="et-nota" for="nota">Nota para el equipo (opcional y visible para todos)</label>
+  <input type="text" id="nota" maxlength="120" placeholder="Ejemplo: llego 10 min tarde">
+  <button class="btn-pri" id="btnEnviar" disabled onclick="enviar()">Confirmar mi asistencia</button>
+  <a class="btn-wapp" id="wapp" style="display:none" target="_blank" rel="noopener">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.12 1.533 5.857L.057 23.7a.5.5 0 0 0 .612.612l5.843-1.476A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 0 1-5.003-1.37l-.36-.213-3.467.876.892-3.355-.234-.375A9.818 9.818 0 1 1 12 21.818z"/></svg>
+    Enviar por WhatsApp
+  </a>
+  <button class="btn-cancel" onclick="cerrar()">Cancelar</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="api.js"></script>
+<script>
+var D=null,actual=null,eleccion=null,filtroActual='TODOS';
+function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];})}
+
+function pintar(d){
+  D=d;
+  if(!d.hay){document.getElementById('app').innerHTML='<div class="env"><p class="vacio">Todavía no hay ninguna convocatoria abierta.</p></div>';return;}
+  var p=d.partido,r=d.resumen;
+  var pctSi=r.total?Math.round(r.si/r.total*100):0,pctNo=r.total?Math.round(r.no/r.total*100):0,pctPe=100-pctSi-pctNo;
+  var titUbicacion=p.ubicacion==='CASA'?'🏠 EN CASA':'✈️ FUERA';
+  var titRival=p.rival?(p.ubicacion==='CASA'?'Sporting de Picanya vs '+esc(p.rival):esc(p.rival)+' vs Sporting de Picanya'):'C.F. Sporting de Picanya';
+  var html='<div class="env">'
+   +(p.estadoPartido==='aplazado'?'<div class="banner-aplazado"><div style="font-size:24px">⚠️</div><div><strong>PARTIDO APLAZADO / RINVIATO</strong><p>'+esc(p.motivoAplazado||'Este partido ha sido aplazado. No hay convocatoria activa para esta fecha hasta nuevo aviso.')+'</p></div></div>':'')
+   +'<div class="tarjeta-partido"><div class="cabecera-meta">'
+   +(p.jornada?'<span class="badge b-jornada">Jornada '+esc(p.jornada)+'</span>':'')
+   +'<span class="badge '+(p.ubicacion==='CASA'?'b-casa':'b-fuera')+'">'+titUbicacion+'</span>'
+   +(p.estadoPartido==='aplazado'?'<span class="badge b-aplazado">⚠️ APLAZADO</span>':'')
+   +'</div><div class="titulo-partido">'+titRival+'</div>'
+   +'<p class="fecha-partido">'+esc(p.fechaLarga)+'</p><dl class="datos">'
+   +'<dt>Partido</dt><dd>'+esc(p.hora)+' h</dd>'
+   +'<dt>Llegada</dt><dd>'+esc(p.llegada)+' h</dd>'
+   +'<dt>Campo</dt><dd>'+(p.mapa?'<a href="'+esc(p.mapa)+'" target="_blank" rel="noopener">'+esc(p.campo)+'</a>':esc(p.campo))+'</dd>'
+   +'<dt>Camiseta</dt><dd><span class="cam"><i></i>'+esc(p.camiseta)+'</span></dd></dl>'
+   +(p.notas?'<p class="aviso">'+esc(p.notas)+'</p>':'')+'</div>'
+   +(d.cerrada?'<p class="cerrada-aviso" style="margin-top:18px">El plazo de confirmación está cerrado. Habla con el responsable.</p>':'')
+   +'<div class="marcador" style="margin-top:'+(d.cerrada?'14':'18')+'px">'
+   +'<div class="m-card m-si'+(filtroActual==='SI'?' activo-si':'')+'" id="card-si" onclick="filtrarEstado(\'SI\')"><b>'+r.si+'</b><span>van</span></div>'
+   +'<div class="m-card m-no'+(filtroActual==='NO'?' activo-no':'')+'" id="card-no" onclick="filtrarEstado(\'NO\')"><b>'+r.no+'</b><span>no van</span></div>'
+   +'<div class="m-card m-pe'+(filtroActual==='PENDIENTE'?' activo-pe':'')+'" id="card-pe" onclick="filtrarEstado(\'PENDIENTE\')"><b>'+r.pendiente+'</b><span>pendientes</span></div></div>'
+   +'<div class="barra"><i class="b-si" style="width:'+pctSi+'%"></i><i class="b-no" style="width:'+pctNo+'%"></i><i class="b-pe" style="width:'+pctPe+'%"></i></div>'
+   +'<div class="filtros-estado">'
+   +'<button type="button" class="filtro-btn'+(filtroActual==='TODOS'?' sel':'')+'" id="flt-TODOS" onclick="filtrarEstado(\'TODOS\')">Todos ('+r.total+')</button>'
+   +'<button type="button" class="filtro-btn'+(filtroActual==='SI'?' sel sel-SI':'')+'" id="flt-SI" onclick="filtrarEstado(\'SI\')">✅ Van ('+r.si+')</button>'
+   +'<button type="button" class="filtro-btn'+(filtroActual==='NO'?' sel sel-NO':'')+'" id="flt-NO" onclick="filtrarEstado(\'NO\')">❌ No van ('+r.no+')</button>'
+   +'<button type="button" class="filtro-btn'+(filtroActual==='PENDIENTE'?' sel sel-PENDIENTE':'')+'" id="flt-PENDIENTE" onclick="filtrarEstado(\'PENDIENTE\')">⏳ Pendientes ('+r.pendiente+')</button></div>'
+   +'<h2>Busca tu nombre</h2>'
+   +'<div class="search-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>'
+   +'<input type="search" id="buscar" placeholder="Escribe tu apellido…" oninput="lista()" autocomplete="off"></div>'
+   +'<ul id="lista"></ul></div>';
+  document.getElementById('app').innerHTML=html;
+  lista();
+}
+
+function filtrarEstado(est){
+  filtroActual=(filtroActual===est&&est!=='TODOS')?'TODOS':est;
+  ['TODOS','SI','NO','PENDIENTE'].forEach(function(k){
+    var b=document.getElementById('flt-'+k);
+    if(b)b.className='filtro-btn'+(filtroActual===k?' sel sel-'+k:'');
+  });
+  var m={si:'SI',no:'NO',pe:'PENDIENTE'};
+  Object.keys(m).forEach(function(k){
+    var c=document.getElementById('card-'+k);
+    if(c)c.className='m-card m-'+k+(filtroActual===m[k]?' activo-'+k:'');
+  });
+  lista();
+}
+
+function lista(){
+  var q=(document.getElementById('buscar')?document.getElementById('buscar').value:'');
+  var norm=function(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();};
+  var items=D.jugadores.filter(function(j){
+    return (!q||norm(j.nombre).indexOf(norm(q))>-1)&&(filtroActual==='TODOS'||j.estado===filtroActual);
+  });
+  if(!items.length){
+    var txt=filtroActual==='TODOS'?'Ningún jugador con ese nombre.':'No hay jugadores con estado "'+(filtroActual==='SI'?'Van':(filtroActual==='NO'?'No van':'Pendientes'))+'"'+(q?' para esta búsqueda.':'.');
+    document.getElementById('lista').innerHTML='<li><p class="vacio">'+esc(txt)+'</p></li>';return;
+  }
+  document.getElementById('lista').innerHTML=items.map(function(j){
+    var et=j.estado==='SI'?'SÍ, VOY':(j.estado==='NO'?'NO PUEDO':'Pendiente');
+    return '<li><button class="jug'+(j.desconvocado?' desc':'')+'" onclick="abrir(\''+j.id+'\')">'
+     +'<span class="dorsal">'+(j.dorsal?esc(j.dorsal):'–')+'</span>'
+     +'<span class="nom">'+esc(j.nombre)+(j.desconvocado?'<span class="nota-desc">Desconvocado</span>':'')+(j.nota?'<span class="nota-jug">'+esc(j.nota)+'</span>':'')+'</span>'
+     +(j.desconvocado?'':'<span class="sello s-'+j.estado+'">'+et+'</span>')+'</button></li>';
+  }).join('');
+}
+
+function abrir(id){
+  actual=D.jugadores.filter(function(j){return j.id===id;})[0];
+  if(D.cerrada){aviso('El plazo de confirmación está cerrado.');return;}
+  eleccion=actual.estado==='PENDIENTE'?null:actual.estado;
+  document.getElementById('pNombre').textContent=actual.nombre;
+  document.getElementById('nota').value=actual.nota||'';
+  document.getElementById('wapp').style.display='none';
+  marcar();
+  document.getElementById('fondo').classList.add('on');
+  document.getElementById('panel').classList.add('on');
+}
+function cerrar(){
+  document.getElementById('fondo').classList.remove('on');
+  document.getElementById('panel').classList.remove('on');
+}
+function elegir(v){eleccion=v;marcar();}
+function marcar(){
+  document.getElementById('opSi').className='op'+(eleccion==='SI'?' sel-si':'');
+  document.getElementById('opNo').className='op'+(eleccion==='NO'?' sel-no':'');
+  document.getElementById('btnEnviar').disabled=!eleccion;
+}
+
+function enviar(){
+  var b=document.getElementById('btnEnviar'),elegido=eleccion;
+  if(!confirm('¿Confirmas "'+(elegido==='SI'?'SÍ, VOY':'NO PUEDO IR')+'" para '+actual.nombre+'?'))return;
+  b.disabled=true;b.textContent='Guardando…';
+  google.script.run
+    .withSuccessHandler(function(d){
+      b.textContent='Confirmar mi asistencia';
+      pintar(d);aviso('Tu respuesta ha quedado registrada ✓');
+      prepararWapp(actual.nombre,elegido);
+    })
+    .withFailureHandler(function(e){
+      b.disabled=false;b.textContent='Confirmar mi asistencia';
+      aviso(e.message||'No se ha podido guardar. Inténtalo otra vez.');
+    })
+    .guardarRespuesta(actual.id,eleccion,document.getElementById('nota').value);
+}
+
+function prepararWapp(nombre,elegido){
+  var p=D.partido,j=D.jugadores.filter(function(x){return x.nombre===nombre;})[0];
+  var tu=p.ubicacion==='CASA'?'EN CASA':'FUERA';
+  var tr=p.rival?(p.ubicacion==='CASA'?'Sporting de Picanya vs '+p.rival:p.rival+' vs Sporting de Picanya'):'Convocatoria';
+  var t='Confirmación de asistencia · C.F. Sporting de Picanya\n\n'
+   +(p.jornada?'🏆 Jornada '+p.jornada+' ('+tu+')\n':'')
+   +'⚔️ '+tr+'\n📅 '+p.fechaLarga+', '+p.hora+' h\n🕒 Hora de llegada: '+p.llegada+' h\n📍 '+p.campo+'\n👕 Camiseta: '+p.camiseta+'\n\n'
+   +nombre+(j&&j.dorsal?' ('+j.dorsal+')':'')+': '+(elegido==='SI'?'SÍ, VOY.':'NO PUEDO IR.')
+   +(j&&j.nota?'\n💬 '+j.nota:'');
+  var a=document.getElementById('wapp');
+  a.href='https://wa.me/?text='+encodeURIComponent(t);
+  a.style.display='flex';
+}
+
+var tT;
+function aviso(m){
+  var o=document.getElementById('toast');
+  o.textContent=m;o.classList.add('on');
+  clearTimeout(tT);tT=setTimeout(function(){o.classList.remove('on');},4000);
+}
+
+google.script.run.withSuccessHandler(pintar)
+  .withFailureHandler(function(e){document.getElementById('app').innerHTML='<div class="env"><p class="vacio">'+esc(e.message||'Error al cargar')+'</p></div>';})
+  .convocatoria();
+
+document.getElementById('anioPie').textContent=new Date().getFullYear();
+
+google.script.run
+  .withSuccessHandler(function(n){
+    document.getElementById('numVisitas').textContent=n;
+    document.getElementById('contadorVisitas').style.display='flex';
+  })
+  .withFailureHandler(function(){})
+  .contarVisita('index');
+
+function refrescar(){
+  if(document.hidden)return;
+  if(document.getElementById('panel').classList.contains('on'))return;
+  google.script.run
+    .withSuccessHandler(function(d){
+      if(document.getElementById('panel').classList.contains('on'))return;
+      if(D&&JSON.stringify(d)===JSON.stringify(D))return;
+      var b=document.getElementById('buscar'),q=b?b.value:'',foco=b&&document.activeElement===b;
+      pintar(d);
+      if(q){var nb=document.getElementById('buscar');if(nb){nb.value=q;lista();if(foco)nb.focus();}}
+    })
+    .withFailureHandler(function(){})
+    .convocatoria();
+}
+setInterval(refrescar,15000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)refrescar();});
+</script>
+</body>
+</html>

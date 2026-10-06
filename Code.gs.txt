@@ -1,0 +1,832 @@
+/**
+ * C.F. SPORTING DE PICANYA — Convocatoria semanal
+ * Backend Google Apps Script + Google Sheets
+ */
+
+const HOJA_J = 'Jugadores';
+const HOJA_P = 'Partidos';
+const HOJA_R = 'Respuestas';
+
+/** Cambia estos PIN antes de publicar. */
+const PIN_ADMIN = ['5113', '4321'];
+const URL_LOGO = 'https://drive.google.com/thumbnail?id=1e4q_Gu_lq1GaxHk5bsF4VfCqteqUDKsV&sz=w300';
+const URL_FONDO = 'https://drive.google.com/thumbnail?id=10STBS_hRABI8lOFf6-L3vN2ysmL1NVpk&sz=w1600';
+const URL_ICONO = 'https://drive.google.com/thumbnail?id=1e4q_Gu_lq1GaxHk5bsF4VfCqteqUDKsV&sz=w512#.png';
+
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+               'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+/** Configuración de partidos en casa (Polideportivo Municipal de Picanya) */
+const CONFIG_CASA = {
+  horaPartido: '15:30',
+  horaLlegada: '14:45',
+  campo: 'Pol. Municipal de Picanya',
+  mapa: 'https://www.google.es/maps/dir//Polideportivo+Pica%C3%B1a+Piscina,+Ctra.+Picanya+a+Alaqu%C3%A0s,+1,+46210+Picanya,+Valencia/@39.4457561,-0.4467615,663m/data=!3m1!1e3!4m17!1m8!3m7!1s0xd604fd3198d9991:0x53838ae24f25e8ba!2sPolideportivo+Pica%C3%B1a+Piscina!8m2!3d39.4461389!4d-0.4439864!15sCiJwb2xpZGVwb3J0aXZvIG11bmljaXBhbCBkZSBwaWNhbnlhWiQiInBvbGlkZXBvcnRpdm8gbXVuaWNpcGFsIGRlIHBpY2FueWGSAQ5zcG9ydHNfY29tcGxleJoBRENpOURRVWxSUVVOdlpFTm9kSGxqUmpsdlQyMUdXRTVZWkVWT2ExcFdWMnhXTWxOVlZUSmxWazV2VFd0R2JVNUZSUkFC4AEA-gEFCI4EEEQ!16s%2Fg%2FMTFjMW55bW0yMg!4m7!1m0!1m5!1m1!1s0xd604fd3198d9991:0x53838ae24f25e8ba!2m2!1d-0.4439864!2d39.4461389?entry=ttu&g_ep=EgoyMDI2MDkxNi4wIKXMDSoASAFQAw%3D%3D',
+  camiseta: 'verde'
+};
+
+/** Calendario oficial de 34 jornadas 2026/2027 */
+const CALENDARIO_OFICIAL = [
+  { jornada: 1,  fecha: '2026-09-20', rival: 'Evangélico C.F.', esCasa: false, partido: 'Evangélico C.F. – C.F. Sporting de Picanya “A”' },
+  { jornada: 2,  fecha: '2026-09-27', rival: 'U.D. Aldaia C.F.', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – U.D. Aldaia C.F.' },
+  { jornada: 3,  fecha: '2026-10-04', rival: 'C.D. Veteranos Atlètic de Buñol “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – C.D. Veteranos Atlètic de Buñol “A”' },
+  { jornada: 4,  fecha: '2026-10-11', rival: 'Xirivella C.F. “A”', esCasa: false, partido: 'Xirivella C.F. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 5,  fecha: '2026-10-18', rival: 'Manises C.F. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Manises C.F. “A”' },
+  { jornada: 6,  fecha: '2026-10-25', rival: 'C.D. Monte-Sión “A”', esCasa: false, partido: 'C.D. Monte-Sión “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 7,  fecha: '2026-11-01', rival: 'U.D. Quart de Poblet “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – U.D. Quart de Poblet “A”' },
+  { jornada: 8,  fecha: '2026-11-08', rival: 'Torrent C.F. “A”', esCasa: false, partido: 'Torrent C.F. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 9,  fecha: '2026-11-15', rival: 'U.D.P. Veteranos de Paiporta “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – U.D.P. Veteranos de Paiporta “A”' },
+  { jornada: 10, fecha: '2026-11-22', rival: 'San Antonio de Benagéber C.F.', esCasa: false, partido: 'San Antonio de Benagéber C.F. – C.F. Sporting de Picanya “A”' },
+  { jornada: 11, fecha: '2026-11-29', rival: 'At. Benimar Picanya C.F. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – At. Benimar Picanya C.F. “A”' },
+  { jornada: 12, fecha: '2026-12-06', rival: 'C.D. Juventud Picanya', esCasa: false, partido: 'C.D. Juventud Picanya – C.F. Sporting de Picanya “A”' },
+  { jornada: 13, fecha: '2026-12-13', rival: 'Mislata C.F. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Mislata C.F. “A”' },
+  { jornada: 14, fecha: '2026-12-20', rival: 'C.D. Serranos Valencia', esCasa: false, partido: 'C.D. Serranos Valencia – C.F. Sporting de Picanya “A”' },
+  { jornada: 15, fecha: '2027-01-10', rival: 'Discóbolo-La Torre A.C. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Discóbolo-La Torre A.C. “A”' },
+  { jornada: 16, fecha: '2027-01-17', rival: 'U.D. Quart de Poblet “B”', esCasa: false, partido: 'U.D. Quart de Poblet “B” – C.F. Sporting de Picanya “A”' },
+  { jornada: 17, fecha: '2027-01-24', rival: 'P.F. Veteranos Juventud “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – P.F. Veteranos Juventud “A”' },
+  { jornada: 18, fecha: '2027-01-31', rival: 'Evangélico C.F.', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Evangélico C.F.' },
+  { jornada: 19, fecha: '2027-02-07', rival: 'U.D. Aldaia C.F.', esCasa: false, partido: 'U.D. Aldaia C.F. – C.F. Sporting de Picanya “A”' },
+  { jornada: 20, fecha: '2027-02-14', rival: 'C.D. Veteranos Atlètic de Buñol “A”', esCasa: false, partido: 'C.D. Veteranos Atlètic de Buñol “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 21, fecha: '2027-02-21', rival: 'Xirivella C.F. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Xirivella C.F. “A”' },
+  { jornada: 22, fecha: '2027-02-28', rival: 'Manises C.F. “A”', esCasa: false, partido: 'Manises C.F. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 23, fecha: '2027-03-07', rival: 'C.D. Monte-Sión “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – C.D. Monte-Sión “A”' },
+  { jornada: 24, fecha: '2027-03-14', rival: 'U.D. Quart de Poblet “A”', esCasa: false, partido: 'U.D. Quart de Poblet “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 25, fecha: '2027-03-21', rival: 'Torrent C.F. “A”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – Torrent C.F. “A”' },
+  { jornada: 26, fecha: '2027-04-04', rival: 'U.D.P. Veteranos de Paiporta “A”', esCasa: false, partido: 'U.D.P. Veteranos de Paiporta “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 27, fecha: '2027-04-11', rival: 'San Antonio de Benagéber C.F.', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – San Antonio de Benagéber C.F.' },
+  { jornada: 28, fecha: '2027-04-18', rival: 'At. Benimar Picanya C.F. “A”', esCasa: false, partido: 'At. Benimar Picanya C.F. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 29, fecha: '2027-04-25', rival: 'C.D. Juventud Picanya', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – C.D. Juventud Picanya' },
+  { jornada: 30, fecha: '2027-05-02', rival: 'Mislata C.F. “A”', esCasa: false, partido: 'Mislata C.F. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 31, fecha: '2027-05-09', rival: 'C.D. Serranos Valencia', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – C.D. Serranos Valencia' },
+  { jornada: 32, fecha: '2027-05-16', rival: 'Discóbolo-La Torre A.C. “A”', esCasa: false, partido: 'Discóbolo-La Torre A.C. “A” – C.F. Sporting de Picanya “A”' },
+  { jornada: 33, fecha: '2027-05-23', rival: 'U.D. Quart de Poblet “B”', esCasa: true, partido: 'C.F. Sporting de Picanya “A” – U.D. Quart de Poblet “B”' },
+  { jornada: 34, fecha: '2027-05-30', rival: 'P.F. Veteranos Juventud “A”', esCasa: false, partido: 'P.F. Veteranos Juventud “A” – C.F. Sporting de Picanya “A”' }
+];
+
+/* ------------------------------------------------------------------ rutas */
+
+function doGet(e) {
+  const p = (e && e.parameter && e.parameter.p) || '';
+  const fichero = (p === 'admin') ? 'Admin' : 'Index';
+  const t = HtmlService.createTemplateFromFile(fichero);
+
+  t.autorizado = (p === 'admin') && PIN_ADMIN.includes(e.parameter.k || '');
+  t.urlLogo = URL_LOGO;
+  t.urlFondo = URL_FONDO;
+
+  const titulo = (p === 'admin') ? 'Convocatoria · C.F. Sporting de Picanya' : 'Conv. Sporting Picanya';
+
+  return t.evaluate()
+    .setTitle(titulo)
+    .setFaviconUrl(URL_ICONO)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/* ----------------------------------------------------------------- utiles */
+
+function contarVisita(pagina) {
+  const props = PropertiesService.getScriptProperties();
+  const clave = 'visitas_' + (pagina === 'admin' ? 'admin' : 'index');
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    const nuevo = (Number(props.getProperty(clave)) || 0) + 1;
+    props.setProperty(clave, String(nuevo));
+    return nuevo;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function hoja(nombre) {
+  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nombre);
+}
+
+function filas(nombre) {
+  const h = hoja(nombre);
+  const v = h.getDataRange().getValues();
+  const cab = v.shift();
+  return v.filter(function (f) { return String(f[0]).trim() !== ''; })
+          .map(function (f) {
+            const o = {};
+            cab.forEach(function (c, i) { o[String(c).trim()] = f[i]; });
+            return o;
+          });
+}
+
+function ahora() {
+  return Utilities.formatDate(new Date(), husos(), 'yyyy-MM-dd HH:mm');
+}
+
+function husos() {
+  return SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || 'Europe/Madrid';
+}
+
+/** '2026-09-19' -> 'Sábado 19 de septiembre de 2026' */
+function fechaLarga(iso) {
+  if (!iso) return '';
+  const p = String(iso).slice(0, 10).split('-');
+  const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  if (isNaN(d.getTime())) return String(iso);
+  const dia = DIAS[d.getDay()];
+  return dia.charAt(0).toUpperCase() + dia.slice(1) +
+         ' ' + d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function texto(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, husos(), 'yyyy-MM-dd');
+  return v === null || v === undefined ? '' : String(v).trim();
+}
+
+/* -------------------------------------------------------------- lectura */
+
+function asegurarColumnasPartidos(h) {
+  if (!h) return;
+  const v = h.getDataRange().getValues();
+  if (!v || !v.length) return;
+  const cab = v[0].map(function(c) { return String(c).trim(); });
+  const columnasExtra = ['Jornada', 'Rival', 'Ubicacion', 'EstadoPartido', 'MotivoAplazado'];
+  const faltantes = [];
+  columnasExtra.forEach(function(col) {
+    if (cab.indexOf(col) === -1) faltantes.push(col);
+  });
+  if (faltantes.length > 0) {
+    const colInicio = cab.length + 1;
+    h.getRange(1, colInicio, 1, faltantes.length).setValues([faltantes]).setFontWeight('bold');
+  }
+}
+
+function asegurarColumnasRespuestas(h) {
+  if (!h) return;
+  const v = h.getDataRange().getValues();
+  if (!v || !v.length) return;
+  const cab = v[0].map(function(c) { return String(c).trim(); });
+  if (cab.indexOf('Desconvocado') === -1) {
+    h.getRange(1, cab.length + 1).setValue('Desconvocado').setFontWeight('bold');
+  }
+}
+
+function siguienteJornadaSugerida() {
+  const ps = filas(HOJA_P);
+  let maxJornada = 0;
+  ps.forEach(function(p) {
+    const num = parseInt(p.Jornada, 10);
+    if (!isNaN(num) && num > maxJornada) maxJornada = num;
+  });
+  if (maxJornada > 0 && maxJornada < CALENDARIO_OFICIAL.length) {
+    return maxJornada + 1;
+  }
+  const hoyStr = Utilities.formatDate(new Date(), husos(), 'yyyy-MM-dd');
+  const proxima = CALENDARIO_OFICIAL.find(function(item) {
+    return item.fecha >= hoyStr;
+  });
+  return proxima ? proxima.jornada : 1;
+}
+
+function partidoActivo() {
+  const ps = filas(HOJA_P);
+  const activos = ps.filter(function (p) { return texto(p.Estado) === 'activo'; });
+  return activos.length ? activos[activos.length - 1] : null;
+}
+
+function convocatoria() {
+  const hP = hoja(HOJA_P);
+  if (hP) asegurarColumnasPartidos(hP);
+  const hR = hoja(HOJA_R);
+  if (hR) asegurarColumnasRespuestas(hR);
+
+  const p = partidoActivo();
+
+  const todos = filas(HOJA_J).map(function(j) {
+    const activoTexto = String(j.Activo).trim().toLowerCase();
+    const activo = activoTexto !== 'no' && activoTexto !== 'false' && activoTexto !== '0';
+
+    return {
+      id: texto(j.ID),
+      nombre: texto(j.Nombre),
+      dorsal: texto(j.Dorsal),
+      activo: activo
+    };
+  });
+
+  const jugadoresActivos = todos.filter(function(j) {
+    return j.activo;
+  });
+
+  const rs = {};
+
+  if (p) {
+    filas(HOJA_R).forEach(function(r) {
+      if (texto(r.IDPartido) === texto(p.ID)) {
+        rs[texto(r.IDJugador)] = r;
+      }
+    });
+  }
+
+  const conRespuesta = function(j) {
+    const r = rs[j.id] || {};
+
+    return {
+      id: j.id,
+      nombre: j.nombre,
+      dorsal: j.dorsal,
+      activo: j.activo,
+      estado: texto(r.Estado) || 'PENDIENTE',
+      nota: texto(r.Nota),
+      modificado: texto(r.Modificado),
+      desconvocado: texto(r.Desconvocado) === 'si'
+    };
+  };
+
+  const jugadores = jugadoresActivos
+    .map(conRespuesta)
+    .sort(function(a, b) {
+      return a.nombre.localeCompare(b.nombre, 'es');
+    });
+
+  const jugadoresAdmin = todos
+    .map(conRespuesta)
+    .sort(function(a, b) {
+      return a.nombre.localeCompare(b.nombre, 'es');
+    });
+
+  const cierre = p ? texto(p.Cierre) : '';
+
+  return {
+    hay: !!p,
+    partido: p ? {
+      id: texto(p.ID),
+      fecha: texto(p.Fecha),
+      fechaLarga: fechaLarga(texto(p.Fecha)),
+      hora: texto(p.HoraPartido),
+      llegada: texto(p.HoraLlegada),
+      campo: texto(p.Campo),
+      mapa: texto(p.Mapa),
+      camiseta: texto(p.Camiseta),
+      notas: texto(p.Notas),
+      cierre: cierre,
+      jornada: texto(p.Jornada),
+      rival: texto(p.Rival),
+      ubicacion: (texto(p.Ubicacion) || 'CASA').toUpperCase(),
+      estadoPartido: (texto(p.EstadoPartido) || 'programado').toLowerCase(),
+      motivoAplazado: texto(p.MotivoAplazado)
+    } : null,
+    cerrada: !!cierre &&
+      (new Date().getTime() > new Date(cierre.replace(' ', 'T')).getTime()),
+    jugadores: jugadores,
+    jugadoresAdmin: jugadoresAdmin,
+    calendario: CALENDARIO_OFICIAL,
+    configCasa: CONFIG_CASA,
+    siguienteJornada: siguienteJornadaSugerida(),
+    resumen: {
+      total: jugadores.length,
+      si: jugadores.filter(function(j) {
+        return j.estado === 'SI';
+      }).length,
+      no: jugadores.filter(function(j) {
+        return j.estado === 'NO';
+      }).length,
+      pendiente: jugadores.filter(function(j) {
+        return j.estado === 'PENDIENTE';
+      }).length
+    }
+  };
+}
+
+/* -------------------------------------------------------------- escritura */
+
+function guardarRespuesta(idJugador, estado, nota) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const c = convocatoria();
+    if (!c.hay) throw new Error('No hay ninguna convocatoria abierta.');
+    if (c.cerrada) throw new Error('El plazo para confirmar ya está cerrado. Avisa al responsable.');
+    if (estado !== 'SI' && estado !== 'NO') throw new Error('Respuesta no válida.');
+
+    const h = hoja(HOJA_R);
+    const v = h.getDataRange().getValues();
+    const idP = c.partido.id;
+    for (var i = 1; i < v.length; i++) {
+      if (texto(v[i][0]) === idP && texto(v[i][1]) === texto(idJugador)) {
+        h.getRange(i + 1, 3, 1, 3).setValues([[estado, texto(nota).slice(0, 120), ahora()]]);
+        return convocatoria();
+      }
+    }
+    h.appendRow([idP, texto(idJugador), estado, texto(nota).slice(0, 120), ahora(), ahora()]);
+    return convocatoria();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function cambiarEstadoAdmin(clave, idJugador, estado, nota) {
+  comprobar(clave);
+  if (estado === 'PENDIENTE') {
+    const c = convocatoria();
+    const h = hoja(HOJA_R);
+    const v = h.getDataRange().getValues();
+    for (var i = v.length - 1; i >= 1; i--) {
+      if (texto(v[i][0]) === c.partido.id && texto(v[i][1]) === texto(idJugador)) h.deleteRow(i + 1);
+    }
+    return convocatoria();
+  }
+  return guardarRespuestaForzada(idJugador, estado, nota);
+}
+
+/** Marca o desmarca a un jugador como "Desconvocado" (excluido por el mister) en la convocatoria activa.
+ *  No altera su respuesta SI/NO/PENDIENTE, y esa convocatoria no cuenta en sus estadísticas de presencia. */
+function marcarDesconvocado(clave, idJugador, desconvocado) {
+  comprobar(clave);
+  const c = convocatoria();
+  if (!c.hay) throw new Error('No hay ninguna convocatoria abierta.');
+
+  const h = hoja(HOJA_R);
+  asegurarColumnasRespuestas(h);
+  const v = h.getDataRange().getValues();
+  const cab = v[0].map(function(x) { return String(x).trim(); });
+  const colDesc = cab.indexOf('Desconvocado');
+  const colMod = cab.indexOf('Modificado');
+  const idP = c.partido.id;
+
+  for (var i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === idP && texto(v[i][1]) === texto(idJugador)) {
+      h.getRange(i + 1, colDesc + 1).setValue(desconvocado ? 'si' : '');
+      if (colMod !== -1) h.getRange(i + 1, colMod + 1).setValue(ahora());
+      return convocatoria();
+    }
+  }
+
+  const nuevaFila = cab.map(function(col) {
+    if (col === 'IDPartido') return idP;
+    if (col === 'IDJugador') return texto(idJugador);
+    if (col === 'Desconvocado') return desconvocado ? 'si' : '';
+    if (col === 'Creado' || col === 'Modificado') return ahora();
+    return '';
+  });
+  h.appendRow(nuevaFila);
+  return convocatoria();
+}
+
+function guardarRespuestaForzada(idJugador, estado, nota) {
+  const c = convocatoria();
+  const h = hoja(HOJA_R);
+  const v = h.getDataRange().getValues();
+  for (var i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === c.partido.id && texto(v[i][1]) === texto(idJugador)) {
+      h.getRange(i + 1, 3, 1, 3).setValues([[estado, texto(nota), ahora()]]);
+      return convocatoria();
+    }
+  }
+  h.appendRow([c.partido.id, texto(idJugador), estado, texto(nota), ahora(), ahora()]);
+  return convocatoria();
+}
+
+function guardarPartido(clave, datos) {
+  comprobar(clave);
+  const h = hoja(HOJA_P);
+  asegurarColumnasPartidos(h);
+  const v = h.getDataRange().getValues();
+  const cab = v[0].map(function(c) { return String(c).trim(); });
+
+  for (var i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === texto(datos.id)) {
+      const fila = i + 1;
+      const mapeo = {
+        'Fecha': datos.fecha,
+        'HoraPartido': datos.hora,
+        'HoraLlegada': datos.llegada,
+        'Campo': datos.campo,
+        'Mapa': datos.mapa,
+        'Camiseta': datos.camiseta,
+        'Notas': datos.notas,
+        'Cierre': datos.cierre,
+        'Jornada': datos.jornada !== undefined ? datos.jornada : '',
+        'Rival': datos.rival !== undefined ? datos.rival : '',
+        'Ubicacion': datos.ubicacion !== undefined ? datos.ubicacion : '',
+        'EstadoPartido': datos.estadoPartido || 'programado',
+        'MotivoAplazado': datos.motivoAplazado !== undefined ? datos.motivoAplazado : ''
+      };
+
+      Object.keys(mapeo).forEach(function(col) {
+        const cIdx = cab.indexOf(col);
+        if (cIdx !== -1) {
+          h.getRange(fila, cIdx + 1).setValue(mapeo[col]);
+        }
+      });
+      return convocatoria();
+    }
+  }
+  throw new Error('Partido no encontrado.');
+}
+
+/** Archiva la convocatoria actual y abre una nueva (todos vuelven a PENDIENTE). */
+function nuevoPartido(clave, datos) {
+  comprobar(clave);
+  const h = hoja(HOJA_P);
+  asegurarColumnasPartidos(h);
+  const v = h.getDataRange().getValues();
+  const cab = v[0].map(function(c) { return String(c).trim(); });
+  const colEstado = cab.indexOf('Estado');
+
+  var max = 0;
+  for (var i = 1; i < v.length; i++) {
+    max = Math.max(max, Number(v[i][0]) || 0);
+    if (colEstado !== -1 && texto(v[i][colEstado]) === 'activo') {
+      h.getRange(i + 1, colEstado + 1).setValue('archivado');
+    }
+  }
+
+  const mapeo = {
+    'ID': max + 1,
+    'Fecha': datos.fecha,
+    'HoraPartido': datos.hora,
+    'HoraLlegada': datos.llegada,
+    'Campo': datos.campo,
+    'Mapa': datos.mapa,
+    'Camiseta': datos.camiseta,
+    'Notas': datos.notas,
+    'Cierre': datos.cierre,
+    'Estado': 'activo',
+    'Jornada': datos.jornada !== undefined ? datos.jornada : '',
+    'Rival': datos.rival !== undefined ? datos.rival : '',
+    'Ubicacion': datos.ubicacion !== undefined ? datos.ubicacion : '',
+    'EstadoPartido': datos.estadoPartido || 'programado',
+    'MotivoAplazado': datos.motivoAplazado !== undefined ? datos.motivoAplazado : ''
+  };
+
+  const nuevaFila = cab.map(function(col) {
+    return mapeo.hasOwnProperty(col) ? mapeo[col] : '';
+  });
+
+  h.appendRow(nuevaFila);
+  return convocatoria();
+}
+
+/** Cambia el estado del partido (programado / aplazado) */
+function cambiarEstadoPartido(clave, idPartido, nuevoEstado, motivo) {
+  comprobar(clave);
+  const h = hoja(HOJA_P);
+  asegurarColumnasPartidos(h);
+  const v = h.getDataRange().getValues();
+  const cab = v[0].map(function(c) { return String(c).trim(); });
+  const colEstadoP = cab.indexOf('EstadoPartido');
+  const colMotivo = cab.indexOf('MotivoAplazado');
+
+  for (var i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === texto(idPartido)) {
+      if (colEstadoP !== -1) h.getRange(i + 1, colEstadoP + 1).setValue(nuevoEstado);
+      if (colMotivo !== -1 && motivo !== undefined) h.getRange(i + 1, colMotivo + 1).setValue(motivo);
+      return convocatoria();
+    }
+  }
+  throw new Error('Partido no encontrado.');
+}
+
+function historial(clave) {
+  comprobar(clave);
+  const rs = filas(HOJA_R);
+  return filas(HOJA_P).map(function (p) {
+    const r = rs.filter(function (x) { return texto(x.IDPartido) === texto(p.ID); });
+    return {
+      id: texto(p.ID),
+      fecha: texto(p.Fecha),
+      fechaLarga: fechaLarga(texto(p.Fecha)),
+      campo: texto(p.Campo),
+      estado: texto(p.Estado),
+      jornada: texto(p.Jornada),
+      rival: texto(p.Rival),
+      ubicacion: (texto(p.Ubicacion) || '').toUpperCase(),
+      estadoPartido: (texto(p.EstadoPartido) || 'programado').toLowerCase(),
+      motivoAplazado: texto(p.MotivoAplazado),
+      si: r.filter(function (x) { return texto(x.Estado) === 'SI'; }).length,
+      no: r.filter(function (x) { return texto(x.Estado) === 'NO'; }).length
+    };
+  }).reverse();
+}
+
+function comprobar(clave) {
+  if (!PIN_ADMIN.includes(String(clave).trim())) {
+    throw new Error('Acceso no autorizado.');
+  }
+}
+
+function estadisticas(clave) {
+  comprobar(clave);
+
+  const hR = hoja(HOJA_R);
+  if (hR) asegurarColumnasRespuestas(hR);
+
+  const jugadores = filas(HOJA_J);
+  const partidos = filas(HOJA_P);
+  const respuestas = filas(HOJA_R);
+
+  // Las partidas aplazadas NO se contabilizan en las estadísticas de presencia
+  const partidosContabilizados = partidos.filter(function(p) {
+    const estado = texto(p.Estado);
+    const estadoPartido = (texto(p.EstadoPartido) || 'programado').toLowerCase();
+    return (estado === 'archivado' || estado === 'activo') && estadoPartido !== 'aplazado';
+  });
+
+  const porJugador = {};
+
+  jugadores.forEach(function(j) {
+    porJugador[texto(j.ID)] = {
+      id: texto(j.ID),
+      nombre: texto(j.Nombre),
+      dorsal: texto(j.Dorsal),
+      convocatorias: 0,
+      si: 0,
+      no: 0,
+      pendiente: 0,
+      desconvocado: 0,
+      porcentaje: 0
+    };
+  });
+
+  partidosContabilizados.forEach(function(p) {
+    const idPartido = texto(p.ID);
+
+    jugadores.forEach(function(j) {
+      const idJugador = texto(j.ID);
+      const dato = porJugador[idJugador];
+
+      if (!dato) return;
+
+      const respuesta = respuestas.find(function(r) {
+        return texto(r.IDPartido) === idPartido &&
+               texto(r.IDJugador) === idJugador;
+      });
+
+      // Si el mister lo desconvocó para ese partido, no cuenta en su estadística de presencia
+      if (respuesta && texto(respuesta.Desconvocado) === 'si') {
+        dato.desconvocado++;
+        return;
+      }
+
+      dato.convocatorias++;
+
+      if (!respuesta) {
+        dato.pendiente++;
+      } else if (texto(respuesta.Estado) === 'SI') {
+        dato.si++;
+      } else if (texto(respuesta.Estado) === 'NO') {
+        dato.no++;
+      } else {
+        dato.pendiente++;
+      }
+    });
+  });
+
+  return {
+    partidos: partidosContabilizados.length,
+    jugadores: Object.keys(porJugador)
+      .map(function(id) {
+        const j = porJugador[id];
+        j.porcentaje = j.convocatorias
+          ? Math.round((j.si / j.convocatorias) * 100)
+          : 0;
+        return j;
+      })
+      .sort(function(a, b) {
+        if (b.porcentaje !== a.porcentaje) return b.porcentaje - a.porcentaje;
+        return b.si - a.si;
+      })
+  };
+}
+
+/** Devuelve la lista de jugadores y respuestas de un partido archivado/pasado */
+function respuestasPartidoHistorial(clave, idPartido) {
+  comprobar(clave);
+  const p = filas(HOJA_P).find(function(x) { return texto(x.ID) === texto(idPartido); });
+  if (!p) throw new Error('Partido no encontrado.');
+  const jugadores = filas(HOJA_J);
+  const rs = filas(HOJA_R).filter(function(r) { return texto(r.IDPartido) === texto(idPartido); });
+  const mapR = {};
+  rs.forEach(function(r) { mapR[texto(r.IDJugador)] = r; });
+
+  return {
+    partido: {
+      id: texto(p.ID),
+      jornada: texto(p.Jornada),
+      rival: texto(p.Rival),
+      fechaLarga: fechaLarga(texto(p.Fecha)),
+      campo: texto(p.Campo),
+      estado: texto(p.Estado),
+      estadoPartido: (texto(p.EstadoPartido) || 'programado').toLowerCase()
+    },
+    jugadores: jugadores.map(function(j) {
+      const r = mapR[texto(j.ID)] || {};
+      return {
+        id: texto(j.ID),
+        nombre: texto(j.Nombre),
+        dorsal: texto(j.Dorsal),
+        estado: texto(r.Estado) || 'PENDIENTE',
+        nota: texto(r.Nota)
+      };
+    }).sort(function(a, b) { return a.nombre.localeCompare(b.nombre, 'es'); })
+  };
+}
+
+/** Permite al admin corregir la presencia (SI, NO, PENDIENTE) de un partido pasado */
+function cambiarPresenciaHistorial(clave, idPartido, idJugador, nuevoEstado) {
+  comprobar(clave);
+  const h = hoja(HOJA_R);
+  const v = h.getDataRange().getValues();
+  const idP = texto(idPartido);
+  const idJ = texto(idJugador);
+
+  if (nuevoEstado === 'PENDIENTE') {
+    for (var i = v.length - 1; i >= 1; i--) {
+      if (texto(v[i][0]) === idP && texto(v[i][1]) === idJ) {
+        h.deleteRow(i + 1);
+        break;
+      }
+    }
+  } else {
+    var encontrado = false;
+    for (var i = 1; i < v.length; i++) {
+      if (texto(v[i][0]) === idP && texto(v[i][1]) === idJ) {
+        h.getRange(i + 1, 3, 1, 3).setValues([[nuevoEstado, '', ahora()]]);
+        encontrado = true;
+        break;
+      }
+    }
+    if (!encontrado) {
+      h.appendRow([idP, idJ, nuevoEstado, '', ahora(), ahora()]);
+    }
+  }
+
+  return respuestasPartidoHistorial(clave, idPartido);
+}
+
+function guardarJugador(clave, datos) {
+  comprobar(clave);
+
+  const id = texto(datos.id);
+  const nombre = texto(datos.nombre);
+  const dorsal = texto(datos.dorsal);
+  const activo = datos.activo ? 'si' : 'no';
+
+  if (!id) {
+    throw new Error('Falta el ID del jugador.');
+  }
+
+  if (!nombre) {
+    throw new Error('El nombre del jugador es obligatorio.');
+  }
+
+  const h = hoja(HOJA_J);
+  const v = h.getDataRange().getValues();
+
+  for (let i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === id) {
+      h.getRange(i + 1, 2, 1, 3).setValues([[
+        nombre,
+        dorsal,
+        activo
+      ]]);
+
+      return convocatoria();
+    }
+  }
+
+  throw new Error('Jugador no encontrado.');
+}
+
+function nuevoJugador(clave, datos) {
+  comprobar(clave);
+
+  const nombre = texto(datos.nombre);
+  const dorsal = texto(datos.dorsal);
+
+  if (!nombre) {
+    throw new Error('El nombre del jugador es obligatorio.');
+  }
+
+  const h = hoja(HOJA_J);
+  const v = h.getDataRange().getValues();
+
+  let idMaximo = 0;
+
+  for (let i = 1; i < v.length; i++) {
+    idMaximo = Math.max(idMaximo, Number(v[i][0]) || 0);
+  }
+
+  h.appendRow([idMaximo + 1, nombre, dorsal, 'si']);
+
+  return convocatoria();
+}
+
+function eliminarJugador(clave, idJugador) {
+  comprobar(clave);
+
+  const id = texto(idJugador);
+  const h = hoja(HOJA_J);
+  const v = h.getDataRange().getValues();
+
+  const tieneHistorial = filas(HOJA_R).some(function(r) {
+    return texto(r.IDJugador) === id;
+  });
+
+  if (tieneHistorial) {
+    throw new Error(
+      'No se puede eliminar este jugador porque tiene respuestas registradas. ' +
+      'Desactívalo para conservar el historial.'
+    );
+  }
+
+  for (let i = 1; i < v.length; i++) {
+    if (texto(v[i][0]) === id) {
+      h.deleteRow(i + 1);
+      return convocatoria();
+    }
+  }
+
+  throw new Error('Jugador no encontrado.');
+}
+
+/* ---------------------------------------------------------- instalación */
+
+function instalar() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function crear(nombre, cabecera, datos) {
+    var h = ss.getSheetByName(nombre);
+    if (!h) h = ss.insertSheet(nombre);
+    h.clear();
+    h.getRange(1, 1, 1, cabecera.length).setValues([cabecera]).setFontWeight('bold');
+    if (datos.length) h.getRange(2, 1, datos.length, cabecera.length).setValues(datos);
+    h.setFrozenRows(1);
+  }
+
+  const plantilla = [
+    ['ALCAIDE HERRERO, NICOLÁS', 24], ['AMUTIO CERDÁ, ANGEL', 8],
+    ['BERMEJO LAGUNA, ALEJANDRO', 1], ['BONDIA PARREÑO, JONATHAN', 18],
+    ['CEACERO MARCO, FRANCISCO JOSE', 33], ['DE FEZ CASTRO, ISRAEL', 15],
+    ['GAMBARDELLA, MARCELLO', 9], ['GARCIA JUAN, ADRIAN', 2],
+    ['GARCIA MARCOS, JUAN P', 6], ['JIMENEZ MORALES, IVAN', 3],
+    ['JUMBO SEDAMANOS, MIGUEL ANTONIO', ''], ['MARTÍNEZ MARÍN, ISMAEL DAVID', 22],
+    ['MOLERO MARTINEZ, VICENTE', 29], ['NODAL PUERTA, CARLOS', 16],
+    ['PEDRERO LOPEZ, DAVID', 7], ['SAEZ MARTINEZ, JOSE MANUEL', 11],
+    ['VAYA ESPERT, RICARDO', 5], ['VIA KHAY, NABIL ALBERT', 13],
+    ['YUSTE MÁNEZ, ANDRES', ''], ['YUSTE MAÑEZ, JORGE I', 26]
+  ];
+  crear(HOJA_J, ['ID', 'Nombre', 'Dorsal', 'Activo'],
+    plantilla.map(function (j, i) { return [i + 1, j[0], j[1], 'si']; }));
+
+  crear(HOJA_P,
+    ['ID', 'Fecha', 'HoraPartido', 'HoraLlegada', 'Campo', 'Mapa', 'Camiseta', 'Notas', 'Cierre', 'Estado',
+     'Jornada', 'Rival', 'Ubicacion', 'EstadoPartido', 'MotivoAplazado'],
+    [[1, '2026-09-20', '18:30', '17:45', 'Campo Evangélico C.F.',
+      '',
+      'verde', 'Llegad 45 minutos antes. Traed camiseta verde. Avisad si llegáis tarde.',
+      '2026-09-20 16:00', 'activo', '1', 'Evangélico C.F.', 'FUERA', 'programado', '']]);
+
+  const respuestas = {
+    'ALCAIDE HERRERO, NICOLÁS': 'NO',
+    'AMUTIO CERDÁ, ANGEL': 'SI', 'BERMEJO LAGUNA, ALEJANDRO': 'SI',
+    'BONDIA PARREÑO, JONATHAN': 'SI', 'CEACERO MARCO, FRANCISCO JOSE': 'SI',
+    'DE FEZ CASTRO, ISRAEL': 'NO',
+    'GAMBARDELLA, MARCELLO': 'NO', 'GARCIA JUAN, ADRIAN': 'NO',
+    'GARCIA MARCOS, JUAN P': 'SI', 'JIMENEZ MORALES, IVAN': 'SI',
+    'JUMBO SEDAMANOS, MIGUEL ANTONIO': 'SI',
+    'MARTÍNEZ MARÍN, ISMAEL DAVID': 'SI',
+    'MOLERO MARTINEZ, VICENTE': 'SI', 'NODAL PUERTA, CARLOS': 'SI',
+    'SAEZ MARTINEZ, JOSE MANUEL': 'SI',
+    'VAYA ESPERT, RICARDO': 'SI',
+    'VIA KHAY, NABIL ALBERT': 'SI',
+    'YUSTE MAÑEZ, JORGE I': 'SI'
+  };
+  const t = ahora();
+  const datosR = [];
+  plantilla.forEach(function (j, i) {
+    if (respuestas[j[0]]) datosR.push([1, i + 1, respuestas[j[0]], '', t, t]);
+  });
+  crear(HOJA_R, ['IDPartido', 'IDJugador', 'Estado', 'Nota', 'Creado', 'Modificado'], datosR);
+
+  SpreadsheetApp.getUi().alert('Listo. Ahora publica la aplicación web (Implementar > Nueva implementación).');
+}
+const API_FUNZIONI = {
+  convocatoria, guardarRespuesta, cambiarEstadoAdmin, marcarDesconvocado,
+  guardarPartido, nuevoPartido, cambiarEstadoPartido, historial, estadisticas,
+  respuestasPartidoHistorial, cambiarPresenciaHistorial,
+  guardarJugador, nuevoJugador, eliminarJugador, contarVisita
+};
+
+function doPost(e) {
+  let salida;
+  try {
+    const r = JSON.parse(e.postData.contents);
+    const f = API_FUNZIONI[r.fn];
+    if (!f) throw new Error('Funzione non valida');
+    const data = f.apply(null, r.args || []);
+    salida = { data: data === undefined ? null : data };
+  } catch (err) {
+    salida = { error: err.message };
+  }
+  return ContentService.createTextOutput(JSON.stringify(salida))
+    .setMimeType(ContentService.MimeType.JSON);
+}
