@@ -809,20 +809,33 @@ function instalar() {
 
   SpreadsheetApp.getUi().alert('Listo. Ahora publica la aplicación web (Implementar > Nueva implementación).');
 }
-const API_FUNZIONI = {
-  convocatoria, guardarRespuesta, cambiarEstadoAdmin, marcarDesconvocado,
-  guardarPartido, nuevoPartido, cambiarEstadoPartido, historial, estadisticas,
-  respuestasPartidoHistorial, cambiarPresenciaHistorial,
-  guardarJugador, nuevoJugador, eliminarJugador, contarVisita
-};
+function apiFunzioni_() {
+  return {
+    convocatoria: convocatoria,
+    guardarRespuesta: guardarRespuesta,
+    cambiarEstadoAdmin: cambiarEstadoAdmin,
+    marcarDesconvocado: marcarDesconvocado,
+    guardarPartido: guardarPartido,
+    nuevoPartido: nuevoPartido,
+    cambiarEstadoPartido: cambiarEstadoPartido,
+    historial: historial,
+    estadisticas: estadisticas,
+    respuestasPartidoHistorial: respuestasPartidoHistorial,
+    cambiarPresenciaHistorial: cambiarPresenciaHistorial,
+    guardarJugador: guardarJugador,
+    nuevoJugador: nuevoJugador,
+    eliminarJugador: eliminarJugador,
+    contarVisita: contarVisita
+  };
+}
 
 function doPost(e) {
-  let salida;
+  var salida;
   try {
-    const r = JSON.parse(e.postData.contents);
-    const f = API_FUNZIONI[r.fn];
-    if (!f) throw new Error('Funzione non valida');
-    const data = f.apply(null, r.args || []);
+    var r = JSON.parse(e.postData.contents);
+    var f = apiFunzioni_()[r.fn];
+    if (!f) throw new Error('Funcion no valida');
+    var data = f.apply(null, r.args || []);
     salida = { data: data === undefined ? null : data };
   } catch (err) {
     salida = { error: err.message };
